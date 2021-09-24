@@ -126,7 +126,10 @@ RSpec.describe 'Merchant Dashboard page' do
       @b_in_item_1 = create(:invoice_item, item_id: @bad_item_1.id, status: 2)
       @bad_item_2  = create(:item, merchant_id: @merchant.id, name: 'walnuts')
       @b_in_item_2 = create(:invoice_item, item_id: @bad_item_2.id, status: 3)
-      # binding.pry
+
+      @discount_1 = create(:bulk_discount)
+      @discount_2 = create(:bulk_discount)
+
       visit "/merchants/#{@merchant.id}/dashboard"
     end
 
@@ -162,6 +165,11 @@ RSpec.describe 'Merchant Dashboard page' do
     it 'lists items oldest to newest' do
       expect(@good_item_1.name).to appear_before(@good_item_3.name)
       expect(@good_item_3.name).to appear_before(@good_item_4.name)
+    end
+
+    it 'has a link to view all my discounts' do
+      expect(page).to have_link('All Discounts')
+      click_link('All Discounts')
     end
   end
 end
