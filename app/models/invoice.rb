@@ -19,7 +19,7 @@ class Invoice < ApplicationRecord
   end
 
   def paid?
-    transactions.where('result = ?', 'success').count > 0
+    transactions.where('result = ?', 'success').length > 0
   end
 
   def total_revenue
