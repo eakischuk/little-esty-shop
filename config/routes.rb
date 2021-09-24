@@ -18,4 +18,6 @@ Rails.application.routes.draw do
     resources :invoices, only: [:index, :show, :update]
     resources :merchants, only: [:index, :show, :edit, :update, :new, :create]
   end
+
+  resources :bulk_discounts, only: [:index, :show]
 end

@@ -1,0 +1,6 @@
+<% @discounts.each do |discount| %>
+  Percentage Discount: <%= discount.percentage_discount %><br>
+  Quantity Threshold: <%= discount.quantity_threshold %><br>
+  <%= link_to "See Discount #{discount.id}", bulk_discount_path(discount.id) %>
+  <hr>
+<% end %>
