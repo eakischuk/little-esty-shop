@@ -11,7 +11,7 @@ Rails.application.routes.draw do
     get  '/invoices',     to: 'merchant_invoices#index'
     get  '/invoices/:id', to: 'merchant_invoices#show', as: 'invoice'
 
-    resources :bulk_discounts, controller: 'merchant_bulk_discounts', only: [:index]
+    resources :bulk_discounts, controller: 'merchant_bulk_discounts', only: [:index, :show]
   end
 
   resources :admin, only: [:index]
