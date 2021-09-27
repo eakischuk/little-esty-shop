@@ -52,12 +52,14 @@ RSpec.describe 'bulk discounts index page', type: :feature do
       within("#discounts-#{@bulk_discount_1.id}") do
         expect(page).to have_button("Delete")
       end
+
       within("#discounts-#{@bulk_discount_2.id}") do
         expect(page).to have_button("Delete")
         click_on "Delete"
       end
 
       expect(current_path).to eq(merchant_bulk_discounts_path(@merchant))
+      expect(page).to_not have_content("##{@bulk_discount_2.id}")
     end
   end
 end
