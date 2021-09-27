@@ -31,6 +31,12 @@ Rails version: 5.2.6
 * Run the test suite with `bundle exec rspec`.
 * Run your development server with `rails s` to see the app in action.
 
+
+* Or view on Heroku:
+[Admin Dashboard](https://rocky-escarpment-73509.herokuapp.com/admin) / 
+[Example Merchant Dashboard](https://rocky-escarpment-73509.herokuapp.com/merchants/1/dashboard)
+
+
 ## Phases
 
 1. [Database Setup](./doc/db_setup.md)
@@ -53,7 +59,7 @@ This project creates an e-commerce platform that allows two types of users; merc
   * Admin Invoices are listed on a separate index, where admin users can see all invoices which link to individual invoice pages. Each invoice show page displays details about the invoice and all items included on the order, including revenue. An admin user is also able to change the invoice status using a form pre-filled with the current status. 
 
 ## Status
-Project is: complete
+Project is: in-progress
 
 
 ## Contact
