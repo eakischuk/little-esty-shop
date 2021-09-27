@@ -1,7 +1,75 @@
 require 'rails_helper'
 
 RSpec.describe 'Merchant Dashboard page' do
-  context 'when i visit my merchant dashboard' do
+  before(:each) do
+    @merchant = create(:merchant)
+    @item     = create(:item, merchant_id: @merchant.id)
+
+    # 6 successful transactions, 1 failed
+    @customer_1    = create(:customer)
+    @invoice_1     = create(:invoice, customer_id: @customer_1.id)
+    @invoice_item_1  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_1.id)
+    @transaction_1 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
+    @transaction_2 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
+    @transaction_3 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
+    @transaction_4 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
+    @transaction_5 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
+    @transaction_6 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
+    # failed
+    @transaction_7 = create(:transaction, invoice_id: @invoice_1.id)
+
+    # 5 successes
+    @customer_2    = create(:customer)
+    @invoice_2     = create(:invoice, customer_id: @customer_2.id)
+    @invoice_item_2  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_2.id)
+    @transaction_8 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
+    @transaction_9 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
+    @transaction_10 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
+    @transaction_11 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
+    @transaction_12 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
+
+    # 4 successes
+    @customer_3    = create(:customer)
+    @invoice_3     = create(:invoice, customer_id: @customer_3.id)
+    @invoice_item_3  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_3.id)
+    @transaction_13 = create(:transaction, invoice_id: @invoice_3.id, result: 'success')
+    @transaction_14 = create(:transaction, invoice_id: @invoice_3.id, result: 'success')
+    @transaction_15 = create(:transaction, invoice_id: @invoice_3.id, result: 'success')
+    @transaction_16 = create(:transaction, invoice_id: @invoice_3.id, result: 'success')
+
+    # 3 successes
+    @customer_4    = create(:customer)
+    @invoice_4     = create(:invoice, customer_id: @customer_4.id)
+    @invoice_item_4  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_4.id)
+    @transaction_17 = create(:transaction, invoice_id: @invoice_4.id, result: 'success')
+    @transaction_18 = create(:transaction, invoice_id: @invoice_4.id, result: 'success')
+    @transaction_19 = create(:transaction, invoice_id: @invoice_4.id, result: 'success')
+
+    # 2 successes
+    @customer_5    = create(:customer)
+    @invoice_5     = create(:invoice, customer_id: @customer_5.id)
+    @invoice_item_5  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_5.id)
+    @transaction_20 = create(:transaction, invoice_id: @invoice_5.id, result: 'success')
+    @transaction_21 = create(:transaction, invoice_id: @invoice_5.id, result: 'success')
+
+    @customer_6    = create(:customer, first_name: 'Jill')
+    @invoice_6     = create(:invoice, customer_id: @customer_6.id)
+    @invoice_item_6  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_6.id)
+    @transaction_1 = create(:transaction, invoice_id: @invoice_6.id, result: 'success')
+
+
+    @merchant_2 = create(:merchant, name: 'Sals Salsa')
+    @item_2     = create(:item, merchant_id: @merchant_2.id)
+
+    @customer_7    = create(:customer)
+    @invoice_7     = create(:invoice, customer_id: @customer_7.id)
+    @invoice_item_7 = create(:invoice_item, item_id: @item_2.id, invoice_id: @invoice_7.id)
+
+    @bulk_discount_1 = create(:bulk_discount, merchant: @merchant) # 15% for 5 items
+    @bulk_discount_2 = create(:bulk_discount, merchant: @merchant, percentage: 20, quantity_threshold: 10)
+    @bulk_discount_3 = create(:bulk_discount, merchant: @merchant_2, percentage: 10, quantity_threshold: 15)
+  end
+  describe 'when i visit my merchant dashboard' do
     before(:each) do
       @sprouts = create(:merchant)
       visit "/merchants/#{@sprouts.id}/dashboard"
@@ -22,71 +90,8 @@ RSpec.describe 'Merchant Dashboard page' do
     end
   end
 
-  context 'top 5 customers' do
+  describe 'top 5 customers' do
     before(:each) do
-      @merchant = create(:merchant)
-      @item     = create(:item, merchant_id: @merchant.id)
-
-      # 6 successful transactions, 1 failed
-      @customer_1    = create(:customer)
-      @invoice_1     = create(:invoice, customer_id: @customer_1.id)
-      @invoice_item_1  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_1.id)
-      @transaction_1 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
-      @transaction_2 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
-      @transaction_3 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
-      @transaction_4 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
-      @transaction_5 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
-      @transaction_6 = create(:transaction, invoice_id: @invoice_1.id, result: 'success')
-      # failed
-      @transaction_7 = create(:transaction, invoice_id: @invoice_1.id)
-
-      # 5 successes
-      @customer_2    = create(:customer)
-      @invoice_2     = create(:invoice, customer_id: @customer_2.id)
-      @invoice_item_2  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_2.id)
-      @transaction_8 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
-      @transaction_9 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
-      @transaction_10 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
-      @transaction_11 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
-      @transaction_12 = create(:transaction, invoice_id: @invoice_2.id, result: 'success')
-
-      # 4 successes
-      @customer_3    = create(:customer)
-      @invoice_3     = create(:invoice, customer_id: @customer_3.id)
-      @invoice_item_3  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_3.id)
-      @transaction_13 = create(:transaction, invoice_id: @invoice_3.id, result: 'success')
-      @transaction_14 = create(:transaction, invoice_id: @invoice_3.id, result: 'success')
-      @transaction_15 = create(:transaction, invoice_id: @invoice_3.id, result: 'success')
-      @transaction_16 = create(:transaction, invoice_id: @invoice_3.id, result: 'success')
-
-      # 3 successes
-      @customer_4    = create(:customer)
-      @invoice_4     = create(:invoice, customer_id: @customer_4.id)
-      @invoice_item_4  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_4.id)
-      @transaction_17 = create(:transaction, invoice_id: @invoice_4.id, result: 'success')
-      @transaction_18 = create(:transaction, invoice_id: @invoice_4.id, result: 'success')
-      @transaction_19 = create(:transaction, invoice_id: @invoice_4.id, result: 'success')
-
-      # 2 successes
-      @customer_5    = create(:customer)
-      @invoice_5     = create(:invoice, customer_id: @customer_5.id)
-      @invoice_item_5  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_5.id)
-      @transaction_20 = create(:transaction, invoice_id: @invoice_5.id, result: 'success')
-      @transaction_21 = create(:transaction, invoice_id: @invoice_5.id, result: 'success')
-
-      @customer_6    = create(:customer, first_name: 'Jill')
-      @invoice_6     = create(:invoice, customer_id: @customer_6.id)
-      @invoice_item_6  = create(:invoice_item, item_id: @item.id, invoice_id: @invoice_6.id)
-      @transaction_1 = create(:transaction, invoice_id: @invoice_6.id, result: 'success')
-
-
-      @merchant_2 = create(:merchant)
-      @item_2     = create(:item, merchant_id: @merchant_2.id)
-
-      @customer_7    = create(:customer)
-      @invoice_7     = create(:invoice, customer_id: @customer_7.id)
-      @invoice_item_7 = create(:invoice_item, item_id: @item_2.id, invoice_id: @invoice_7.id)
-
       visit "/merchants/#{@merchant.id}/dashboard"
     end
 
@@ -108,7 +113,7 @@ RSpec.describe 'Merchant Dashboard page' do
     end
   end
 
-  context 'items ready to ship' do
+  describe 'items ready to ship' do
     before(:each) do
       @merchant    = create(:merchant)
 
@@ -163,5 +168,7 @@ RSpec.describe 'Merchant Dashboard page' do
       expect(@good_item_1.name).to appear_before(@good_item_3.name)
       expect(@good_item_3.name).to appear_before(@good_item_4.name)
     end
+  end
+  describe 'bulk discounts index link' do
   end
 end
