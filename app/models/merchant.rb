@@ -4,6 +4,7 @@ class Merchant < ApplicationRecord
   has_many :invoice_items, through: :items
   has_many :invoices,  through: :items
   has_many :customers, through: :invoices
+  has_many :bulk_discounts, dependent: :destroy
 
   def favorite_customers
     customers.top_five_with_count
