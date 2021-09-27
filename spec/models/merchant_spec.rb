@@ -119,11 +119,11 @@ RSpec.describe Merchant, type: :model do
       @transaction_f = create(:transaction)
       @invoice_12.transactions << @transaction_f
       @invoice_13 = create(:invoice, created_at: '2012-03-22 08:54:10 UTC') # Thurday, March 22, 2012
-      @transaction_s_13 = create(:transaction, result: 'success')
-      @invoice_13.transactions << @transaction_s_13
+      @transaction_f_13 = create(:transaction)
+      @invoice_13.transactions << @transaction_f_13
       @invoice_14 = create(:invoice, created_at: '2012-03-13 07:54:10 UTC') # Tuesday, March 13, 2012
-      @transaction_s_14 = create(:transaction, result: 'success')
-      @invoice_14.transactions << @transaction_s_14
+      @transaction_f_14 = create(:transaction)
+      @invoice_14.transactions << @transaction_f_14
       @i_i_19 = create(:invoice_item, item: @item_7, unit_price: 2, quantity: 6, invoice: @invoice_12)
       @i_i_20 = create(:invoice_item, item: @item_7, unit_price: 2, quantity: 6, invoice: @invoice_13)
       @i_i_21 = create(:invoice_item, item: @item_7, unit_price: 2, quantity: 6, invoice: @invoice_14)
@@ -138,12 +138,12 @@ RSpec.describe Merchant, type: :model do
     end
 
     it '#top_five' do
-      expect(Merchant.top_five).to eq([@merchant_5, @merchant_6, @merchant_7, @merchant_3, @merchant_4])
+      expect(Merchant.top_five).to eq([@merchant_5, @merchant_6, @merchant_3, @merchant_4, @merchant_1])
     end
 
     describe 'top_five best_day instance method' do
       it '#best_day' do
-        expect(@merchant_7.best_day).to eq(@invoice_13.created_at)
+        expect(@merchant_6.best_day).to eq(@invoice_11.created_at)
         expect(@merchant_1.best_day).to eq(@invoice_1.created_at)
       end
     end
