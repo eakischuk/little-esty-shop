@@ -1,0 +1,8 @@
+<h3>Edit Discount #<%= @discount.id %></h3>
+<%= form_with model: @discount, method: :patch, local: true do |f| %>
+  <%= f.label :percentage %>
+  <%= f.number_field :percentage %><br>
+  <%= f.label :quantity_threshold %>
+  <%= f.number_field :quantity_threshold %><br>
+  <%= f.submit "Update Bulk Discount"%>
+<% end %>
