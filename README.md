@@ -48,7 +48,7 @@ Rails version: 5.2.6
 This project creates an e-commerce platform that allows two types of users; merchants and admin. Each user type has its own set of paths, which access the appropriate features for the user type. 
 
 ## Schema
-![Little Esty Shop Schema](https://user-images.githubusercontent.com/83726180/134429191-0397fbc7-75d4-4220-b61f-6cd846c9d834.png)
+![Little Esty Shop Schema](https://user-images.githubusercontent.com/83726180/135164919-c63d146b-49fa-4ca5-9ede-34cf52385fb8.png)
  
 ## Features
 * As a merchant, the user is able to access the merchant dashboard where they can see navigational links to that merchants items and invoices, and statistics for that particular merchant including favorite customers and items ready to ship.
@@ -57,7 +57,7 @@ This project creates an e-commerce platform that allows two types of users; merc
 * As an admin, the user is able to access the admin dashboard where they can see navigational links to an index of all merchants and an index of all invoices, as well as statistics for the top five highest spending customers on the site and incomplete invoices with unshipped items. 
   * All merchants are listed on the admin index page, where an admin user can create new merchants, see existing merchants sorted by enabled or disabled, and change that merchants status via a button next to each merchant. Admin users can also see statistics for top five merchants with the most revenue with the top selling date for that particular merchant.
   * Admin Invoices are listed on a separate index, where admin users can see all invoices which link to individual invoice pages. Each invoice show page displays details about the invoice and all items included on the order, including revenue. An admin user is also able to change the invoice status using a form pre-filled with the current status. 
-
+  * Bulk Discounts can be created, updated, and deleted by a merchant. Discounts are able to be viewed on an merchant bulk discounts index page, which includes each discount for that merchant and the three upcoming holidays. For each merchant's invoice show page, there is now a section to display dicounted revenue for only that merchant's items, and an admin has access to discounted revenue for the entire invoice.
 ## Status
 Project is: in-progress
 
@@ -67,5 +67,6 @@ Created by
 * [@bdempsey864](https://github.com/bdempsey864)
 * [@michaelpmattson](https://github.com/michaelpmattson)
 * [@eakischuk](https://github.com/eakischuk)
+
 
 ~ feel free to contact us! ~
