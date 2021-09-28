@@ -1,7 +1,8 @@
 <h2>Invoice #<%= @invoice.id %></h2>
 <p>Status: <%= @invoice.status %></p>
 <p>Created on: <%= @invoice.formatted_date %></p>
-<p>Total Revenue: <%= number_to_currency(@revenue) %></p>
+<p>Total Revenue: <%= number_to_currency(@invoice.total_revenue_by_merchant_id(@merchant.id)) %></p>
+<p>Discounted Revenue: <%= number_to_currency(@invoice.discounted_revenue_by_merchant_id(@merchant.id)) %></p>
 
 <p>Customer: <%= @invoice.customer_name %></p>
 
@@ -13,7 +14,7 @@
     <th>Unit Price</th>
     <th>Status</th>
   </tr>
-  <% @invoice_items.each do |i_i| %>
+  <% @invoice.invoice_items_by_merchant_id(@merchant.id).each do |i_i| %>
     <tr id="items-<%= i_i.item_id %>">
       <th><%= i_i.item.name %></th>
       <th><%= i_i.quantity %></th>
