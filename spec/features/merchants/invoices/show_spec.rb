@@ -91,5 +91,18 @@ RSpec.describe 'Merchant Invoice Show Page' do
       expectation_1 = @ii11.discounted_revenue + @ii12.discounted_revenue + @ii13.discounted_revenue
       expect(page).to have_content("Discounted Revenue: $#{expectation_1}")
     end
+
+    it 'displays applied discount' do
+      visit merchant_invoice_path(@merchant_1, @invoice_1.id)
+      within("#items-#{@ii11.item_id}") do
+        expect(page).to have_content("None")
+      end
+      within("#items-#{@ii13.item_id}") do
+        expect(page).to have_content(@bulk_discount_1.id)
+        save_and_open_page
+        click_on "##{@bulk_discount_1.id}"
+      end
+      expect(current_path).to eq(merchant_bulk_discount_path(@merchant_1.id, @bulk_discount_1.id))
+    end
   end
 end
