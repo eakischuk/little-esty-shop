@@ -44,6 +44,16 @@ class Invoice < ApplicationRecord
       0
     end
   end
+
+  def discounted_revenue_by_merchant_id(merchant_id)
+    if paid?
+      invoice_items_by_merchant_id(merchant_id).sum do |i_i|
+        i_i.discounted_revenue
+      end
+    else
+      0
+    end
+  end
 end
 
 # .joins(:invoice_items).where.not('invoice_items.status = ?', 3)
