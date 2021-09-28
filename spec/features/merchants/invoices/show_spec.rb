@@ -99,7 +99,6 @@ RSpec.describe 'Merchant Invoice Show Page' do
       end
       within("#items-#{@ii13.item_id}") do
         expect(page).to have_content(@bulk_discount_1.id)
-        save_and_open_page
         click_on "##{@bulk_discount_1.id}"
       end
       expect(current_path).to eq(merchant_bulk_discount_path(@merchant_1.id, @bulk_discount_1.id))
