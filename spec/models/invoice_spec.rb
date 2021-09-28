@@ -4,21 +4,29 @@ RSpec.describe Invoice, type: :model do
   before(:each) do
     @customer = create(:customer)
 
-    @item_1 = create(:item)
-    @item_2 = create(:item, name: "Hi-Chew")
+    @merchant_1 = create(:merchant)
+    @merchant_2 = create(:merchant)
+
+    @item_1 = create(:item, name: "Hi-Chew", merchant: @merchant_1)
+    @item_2 = create(:item, merchant: @merchant_2)
+
+    @bulk_discount_1 = create(:bulk_discount, merchant: @merchant_1) # 15% for 5 items
+    @bulk_discount_2 = create(:bulk_discount, merchant: @merchant_1, percentage: 20, quantity_threshold: 10)
+    @bulk_discount_3 = create(:bulk_discount, merchant: @merchant_1, percentage: 25, quantity_threshold: 15)
+    @bulk_discount_4 = create(:bulk_discount, merchant: @merchant_2, percentage: 10) # for 5 items
 
     @invoice_1 = create(:invoice, created_at: '2012-03-20 09:54:09 UTC') # Sunday, March 25,2012
     @transaction_1 = create(:transaction, result: 'success')
     @invoice_1.transactions << @transaction_1
     @invoice_1_item_1 = create(:invoice_item, item: @item_1, quantity: 3, unit_price: 7, status: 1)
-    @invoice_1_item_2 = create(:invoice_item, item: @item_2, quantity: 2, unit_price: 6, status: 2)
+    @invoice_1_item_2 = create(:invoice_item, item: @item_2, quantity: 6, unit_price: 2, status: 2)
     @invoice_1.invoice_items << @invoice_1_item_1
     @invoice_1.invoice_items << @invoice_1_item_2
 
     @invoice_2 = create(:invoice, created_at: '2012-03-21 13:54:10 UTC') # Sunday, March 25,2012
     @transaction_2 = create(:transaction)
     @invoice_2.transactions << @transaction_2
-    @invoice_2_item_1 = create(:invoice_item, item: @item_1, quantity: 3, unit_price: 7, status: 1)
+    @invoice_2_item_1 = create(:invoice_item, item: @item_1, quantity: 5, unit_price: 7, status: 1)
     @invoice_2_item_2 = create(:invoice_item, item: @item_2, quantity: 2, unit_price: 6, status: 2)
     @invoice_2.invoice_items << @invoice_2_item_1
     @invoice_2.invoice_items << @invoice_2_item_2
@@ -100,6 +108,12 @@ RSpec.describe Invoice, type: :model do
       expect(@invoice_1.total_revenue).to eq(33)
       expect(@invoice_2.total_revenue).to eq(0)
     end
+
+    it 'returns discounted revenue' do
+      expectation_1 = @invoice_1_item_1.discounted_revenue + @invoice_1_item_2.discounted_revenue
+      expect(@invoice_1.total_discounted_revenue).to eq(expectation_1)
+      expect(@invoice_2.total_discounted_revenue).to eq(0)
+    end
   end
 
   describe '#paid?' do
@@ -132,36 +146,49 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe '#total_revenue_by_merchant_id(merchant_id)' do
-    it 'returns total revenue for a paid invoice for a single merchant_id' do
-      merchant_1 = create(:merchant)
-      merchant_2 = create(:merchant)
+    before(:each) do
+      @merchant_1 = create(:merchant)
+      @merchant_2 = create(:merchant)
 
-      item_1 = create(:item, merchant: merchant_1)
-      item_2 = create(:item, merchant: merchant_1)
-      item_3 = create(:item, merchant: merchant_2)
+      @item_1 = create(:item, merchant: @merchant_1)
+      @item_2 = create(:item, merchant: @merchant_1)
+      @item_3 = create(:item, merchant: @merchant_2)
+
+      @bulk_discount_1 = create(:bulk_discount, merchant: @merchant_1) # 15% for 5 items
+      @bulk_discount_2 = create(:bulk_discount, merchant: @merchant_1, percentage: 20, quantity_threshold: 10)
+      @bulk_discount_3 = create(:bulk_discount, merchant: @merchant_1, percentage: 25, quantity_threshold: 15)
+      @bulk_discount_4 = create(:bulk_discount, merchant: @merchant_2, percentage: 10) # for 5 items
 
       # 1 failure 1 success
-      invoice_1 = create(:invoice)
-      transaction_0 = create(:transaction, invoice: invoice_1)
-      transaction_1 = create(:transaction, result: 'success', invoice: invoice_1)
+      @invoice_1 = create(:invoice)
+      @transaction_0 = create(:transaction, invoice: @invoice_1)
+      @transaction_1 = create(:transaction, result: 'success', invoice: @invoice_1)
 
-      invoice_1_item_1 = create(:invoice_item, invoice: invoice_1, item: item_1, quantity: 3, unit_price: 7)
-      invoice_1_item_2 = create(:invoice_item, invoice: invoice_1, item: item_2, quantity: 2, unit_price: 6)
+      @invoice_1_item_1 = create(:invoice_item, invoice: @invoice_1, item: @item_1, quantity: 10, unit_price: 7)
+      @invoice_1_item_2 = create(:invoice_item, invoice: @invoice_1, item: @item_2, quantity: 2, unit_price: 6)
       # merchant 2s item
-      invoice_1_item_3 = create(:invoice_item, invoice: invoice_1, item: item_3, quantity: 2, unit_price: 6)
+      @invoice_1_item_3 = create(:invoice_item, invoice: @invoice_1, item: @item_3, quantity: 2, unit_price: 6)
 
       # Only failure
-      invoice_2 = create(:invoice)
-      transaction_2 = create(:transaction, invoice: invoice_2)
+      @invoice_2 = create(:invoice)
+      @transaction_2 = create(:transaction, invoice: @invoice_2)
 
-      invoice_2_item_1 = create(:invoice_item, invoice: invoice_2, item: item_1, quantity: 3, unit_price: 7)
-      invoice_2_item_2 = create(:invoice_item, invoice: invoice_2, item: item_2, quantity: 2, unit_price: 6)
+      @invoice_2_item_1 = create(:invoice_item, invoice: @invoice_2, item: @item_1, quantity: 3, unit_price: 7)
+      @invoice_2_item_2 = create(:invoice_item, invoice: @invoice_2, item: @item_2, quantity: 2, unit_price: 6)
+    end
 
-
-      expect(invoice_1.total_revenue_by_merchant_id(merchant_1.id)).to eq(33)
+    it 'returns total revenue for a paid invoice for a single merchant_id' do
+      expect(@invoice_1.total_revenue_by_merchant_id(@merchant_1.id)).to eq(82)
 
       # no successful transactions
-      expect(invoice_2.total_revenue_by_merchant_id(merchant_1.id)).to eq(0)
+      expect(@invoice_2.total_revenue_by_merchant_id(@merchant_1.id)).to eq(0)
+    end
+
+    it 'returns total discounted revenue for a single merchant on a paid invoice' do
+      expectation_1 = @invoice_1_item_2.total_revenue + @invoice_1_item_1.discounted_revenue
+
+      expect(@invoice_1.discounted_revenue_by_merchant_id(@merchant_1.id)).to eq(expectation_1)
+      expect(@invoice_2.discounted_revenue_by_merchant_id(@merchant_1.id)).to eq(0)
     end
   end
 end

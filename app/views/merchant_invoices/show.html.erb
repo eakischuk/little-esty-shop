@@ -1,7 +1,8 @@
 <h2>Invoice #<%= @invoice.id %></h2>
 <p>Status: <%= @invoice.status %></p>
 <p>Created on: <%= @invoice.formatted_date %></p>
-<p>Total Revenue: <%= number_to_currency(@revenue) %></p>
+<p>Total Revenue: <%= number_to_currency(@invoice.total_revenue_by_merchant_id(@merchant.id)) %></p>
+<p>Discounted Revenue: <%= number_to_currency(@invoice.discounted_revenue_by_merchant_id(@merchant.id).round(2)) %></p>
 
 <p>Customer: <%= @invoice.customer_name %></p>
 
@@ -12,13 +13,20 @@
     <th>Quantity</th>
     <th>Unit Price</th>
     <th>Status</th>
+    <th>Discount Applied</th>
   </tr>
-  <% @invoice_items.each do |i_i| %>
+  <% @invoice.invoice_items_by_merchant_id(@merchant.id).each do |i_i| %>
     <tr id="items-<%= i_i.item_id %>">
       <th><%= i_i.item.name %></th>
       <th><%= i_i.quantity %></th>
       <th><%= i_i.unit_price %></th>
       <th><%= i_i.status %></th>
+      <th><% if i_i.best_discount.nil? %>
+            None
+          <% else %>
+            <%= link_to "##{i_i.best_discount.id}", merchant_bulk_discount_path(@merchant.id, i_i.best_discount.id) %>
+          <% end %>
+      </th>
     </tr>
   <% end %>
 </table>

@@ -56,15 +56,20 @@ RSpec.describe 'Merchant Invoice Show Page' do
       @item_5     = create(:item, merchant: @merchant_2)
       @item_6     = create(:item, merchant: @merchant_2)
 
+      @bulk_discount_1 = create(:bulk_discount, merchant: @merchant_1) # 15% for 5 items
+      @bulk_discount_2 = create(:bulk_discount, merchant: @merchant_1, percentage: 20, quantity_threshold: 10)
+      @bulk_discount_3 = create(:bulk_discount, merchant: @merchant_1, percentage: 25, quantity_threshold: 15)
+      @bulk_discount_4 = create(:bulk_discount, merchant: @merchant_2, percentage: 10) # for 5 items
+
       @invoice_1  = create(:invoice)
       @ii11       = create(:invoice_item, invoice: @invoice_1, item: @item_1, quantity: 1, unit_price: 10)
       @ii12       = create(:invoice_item, invoice: @invoice_1, item: @item_2, quantity: 2, unit_price: 6)
-      @ii13       = create(:invoice_item, invoice: @invoice_1, item: @item_3, quantity: 3, unit_price: 5)
+      @ii13       = create(:invoice_item, invoice: @invoice_1, item: @item_3, quantity: 5, unit_price: 5)
 
       @invoice_2  = create(:invoice)
       @ii24       = create(:invoice_item, invoice: @invoice_2, item: @item_4, quantity: 1, unit_price: 10)
       @ii26       = create(:invoice_item, invoice: @invoice_2, item: @item_5, quantity: 2, unit_price: 6)
-      @ii26       = create(:invoice_item, invoice: @invoice_2, item: @item_6, quantity: 3, unit_price: 5)
+      @ii26       = create(:invoice_item, invoice: @invoice_2, item: @item_6, quantity: 10, unit_price: 5)
 
       @transaction_fail_1 = create(:transaction, invoice: @invoice_1)
       @transaction_1      = create(:transaction, invoice: @invoice_1, result: 'success')
@@ -73,12 +78,30 @@ RSpec.describe 'Merchant Invoice Show Page' do
 
     it 'displays total revenue for invoice' do
       visit merchant_invoice_path(@merchant_1, @invoice_1.id)
-      expect(page).to have_content("Total Revenue: $37.00")
+      expect(page).to have_content("Total Revenue: $47.00")
     end
 
     it 'does not add revenue for other merchants' do
       visit merchant_invoice_path(@merchant_1, @invoice_2.id)
       expect(page).to have_content("Total Revenue: $10.00")
+    end
+
+    it 'displays discounted revenue' do
+      visit merchant_invoice_path(@merchant_1, @invoice_1.id)
+      expectation_1 = @ii11.discounted_revenue + @ii12.discounted_revenue + @ii13.discounted_revenue
+      expect(page).to have_content("Discounted Revenue: $#{expectation_1}")
+    end
+
+    it 'displays applied discount' do
+      visit merchant_invoice_path(@merchant_1, @invoice_1.id)
+      within("#items-#{@ii11.item_id}") do
+        expect(page).to have_content("None")
+      end
+      within("#items-#{@ii13.item_id}") do
+        expect(page).to have_content(@bulk_discount_1.id)
+        click_on "##{@bulk_discount_1.id}"
+      end
+      expect(current_path).to eq(merchant_bulk_discount_path(@merchant_1.id, @bulk_discount_1.id))
     end
   end
 end

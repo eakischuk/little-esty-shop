@@ -30,6 +30,16 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def total_discounted_revenue
+    if paid?
+      invoice_items.sum do |i_i|
+        i_i.discounted_revenue
+      end
+    else
+      0
+    end
+  end
+
   def self.incomplete
     joins(:invoice_items)
     .where.not('invoice_items.status = ?', 2)
@@ -40,6 +50,16 @@ class Invoice < ApplicationRecord
   def total_revenue_by_merchant_id(merchant_id)
     if paid?
       invoice_items_by_merchant_id(merchant_id).sum("invoice_items.quantity * invoice_items.unit_price")
+    else
+      0
+    end
+  end
+
+  def discounted_revenue_by_merchant_id(merchant_id)
+    if paid?
+      invoice_items_by_merchant_id(merchant_id).sum do |i_i|
+        i_i.discounted_revenue
+      end
     else
       0
     end
